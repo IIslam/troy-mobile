@@ -1,0 +1,32 @@
+language: java
+
+node_js: "8.12"
+sudo: false
+
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - EXPO_SDK_VERSION="32.0.0"
+    - TURTLE_VERSION="${TURTLE_VERSION_NEW}"
+    - YARN_VERSION="1.10.1"
+
+jobs:
+  include:
+    - stage: publish app
+      env:
+        - CACHE_NAME=publish YARN_CACHE_FOLDER="/home/travis/yarn_cache"
+      cache:
+        directories:
+          - $HOME/yarn_cache
+      before_install:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version $YARN_VERSION
+        - export PATH="$HOME/.yarn/bin:$PATH"
+      install:
+        - yarn global add expo-cli
+      script:
+        - expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD --non-interactive
+        - yarn
+        - expo publish
